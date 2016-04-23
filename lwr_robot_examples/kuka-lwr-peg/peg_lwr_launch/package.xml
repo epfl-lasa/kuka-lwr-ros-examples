@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <name>peg_lwr_launch</name>
+  <version>0.1.0</version>
+  <description>The peg_lwr_launch package to control everything that needs to launched.</description>
+
+  <maintainer email="guillaume.dechambrier@epfl.ch">Guillaume de Chambrier</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>peg_lwr_robot</run_depend>
+  <!--run_depend>single_lwr_moveit</run_depend-->
+
+  <export>
+  </export>
+</package>

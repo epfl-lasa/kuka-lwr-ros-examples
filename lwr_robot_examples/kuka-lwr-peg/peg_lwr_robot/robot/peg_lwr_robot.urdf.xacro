@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kuka_lwr_peg_robot">
+
+	<!-- Include all models -->
+	<xacro:include filename="$(find lwr_description)/model/kuka_lwr.urdf.xacro"/>
+
+
+	<!-- using the models -->
+	<xacro:kuka_lwr name="lwr">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+	</xacro:kuka_lwr>
+
+   	<joint name="dummy_joint" type="fixed">
+       		<origin xyz="0 0 0.2" rpy="0 0 0" />
+       		<parent link="lwr_7_link" />
+       		<child link="dummy_link" />
+     	</joint>
+     
+	<link name="dummy_link">
+         	<origin xyz="0 0 0" rpy="0 0 0"/>
+		<visual>
+             		<origin xyz="0 0 -0.12" rpy="0 0 0"/>
+             		<geometry>
+				<cylinder radius="0.01" length="0.2"/>
+             		</geometry>
+ 			<material name="my_color">
+         			<color rgb="180 255 255" alpha="0.5"/>
+      			 </material>
+                </visual>
+     	</link>
+
+
+	<gazebo reference="dummy_link">
+		<gravity>true</gravity>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+
+
+     	<joint name="lwr_peg_joint" type="fixed">
+       		<origin xyz="0 0 0" rpy="0 0 0" />
+       		<parent link="dummy_link" />
+       		<child link="lwr_peg_link" />
+     	</joint>
+
+	<link name="lwr_peg_link">
+    		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<inertial>
+			<mass value="0.06"/>
+			<origin xyz="0 0 0"/>
+			<cuboid_inertia_def length="1" width="1" height="1" mass="0.06"/>
+		</inertial>
+        	<visual>
+             		<origin xyz="0 0 0" rpy="0 ${-M_PI/2} ${M_PI}"/>
+             		<geometry>
+               			<mesh filename="package://peg_lwr_robot/meshes/peg.dae"/>
+             		</geometry>
+               	</visual>
+         	<collision>
+			<geometry>
+				<cylinder radius="0.04" length="0.05"/>
+			</geometry>
+         	</collision>
+	</link>
+
+
+</robot>
