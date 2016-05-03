@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     ros::Subscriber  vel_sub     = nh.subscribe("/lwr/ee_vel",5,velocity_callback);
 
     /* Iterative solver parameters */
-    unsigned int time_horizon = 20;
+    unsigned int time_horizon = 50;
     unsigned int  x_dim = 6, u_dim = 3; // 3d position + velocity, 3d force at the end effector
     double sampling_time = 1/100.0;
     // IterativeLQSolverParams( minLineSearchParameter, initialLineSearchParameter, minRelativeCostImprovement, maxNumberIterations )
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
      *
      *               where e = (x_d- x_rob)
      *
-     *    -- We solve the problem with an augmented state x = [x_rob^T e^T]^T --
+     *    -- For convenience, we solve the problem with an augmented state x = [x_rob^T e^T]^T --
      *
      * - Initial state: x_initial = [x_rob^T  0^T]^T
      *
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     /*** DYNAMICS ***/
     // Robot dynamic parameters M x_r_ddot + D x_r_dot = u
     motion::Matrix mass(x_dim/2, x_dim/2), damping(x_dim/2,x_dim/2), massInverse(x_dim/2, x_dim/2);
-    mass = motion::Matrix::Identity(x_dim/2, x_dim/2)* 8;
+    mass = motion::Matrix::Identity(x_dim/2, x_dim/2)* 10;
     damping = motion::Matrix::Identity(x_dim/2, x_dim/2)* 0.1;
     massInverse = mass.inverse();
 
@@ -106,13 +106,13 @@ int main(int argc, char** argv)
     //A_d.topLeftCorner(x_dim/2,x_dim/2) << -0.0915, 4.9308, 0, -3.0534, -0.2027, 0, 0, 0, 1;
     A_d.topLeftCorner(x_dim/2,x_dim/2) << 10, 0, 0, 0, 10, 0, 0, 0, 10;
     motion::Vector x_d_center(x_dim);
-    x_d_center << -0.5,0.3,0.6,0,0,0;
+    x_d_center << -0.3,0.3,0.4,0,0,0;
 
 
     /*** COST ***/
     // Cost parameters
     motion::Matrix Q_track(x_dim, x_dim), Q_track_f(x_dim, x_dim), R(u_dim, u_dim);
-    Q_track = motion::Matrix::Identity(x_dim, x_dim) * 1000;
+    Q_track = motion::Matrix::Identity(x_dim, x_dim) * 5000;
     Q_track_f = Q_track;
     R = motion::Matrix::Identity(u_dim, u_dim) * 1;
 

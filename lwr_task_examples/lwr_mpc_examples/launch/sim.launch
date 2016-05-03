@@ -5,13 +5,15 @@
 
   	<include file="$(find lwr_launch)/launch/simulation.launch">
 		<arg name="controllers"	      value="joint_controllers"/>
+	 	<arg name="t1_limits_file" default="$(find lwr_mpc_examples)/config/t1_joint_limits.yaml"/>
+	      	<arg name="controller_config_file" default="$(find lwr_mpc_examples)/config/controllers.yaml"/>
     		<arg name="rviz_config"       value="$(find lwr_mpc_examples)/launch/rviz/rviz_config.rviz"/>
  		<arg name="t1_limits" 	      value="false"/>
  	</include>
 
         <!-- Launch action_client after 4 seconds-->
         <node pkg="lwr_mpc_examples" type="timed_roslaunch.sh"
-            args="5 simple_example client.launch"
+            args="5 lwr_simple_example client.launch"
             name="timed_kuka_client" output="screen">
         </node>
 
