@@ -11,6 +11,7 @@
 #include <eigen3/Eigen/Dense>
 #include <robot_motion_generation/OCProblemFH.h>
 
+
 typedef Eigen::VectorXd Vector;
 typedef Eigen::MatrixXd Matrix;
 
@@ -19,6 +20,7 @@ class PointMassLinear: public motion::OCProblemFH
 private :
     Matrix A_, B_, Q_, Q_f_, R_;                          // State and cost matrices of the full compound state  x = [x_rob ; (x_d - x_rob)]
     Vector A_d_x_d_center_;
+
 
 public :
 

@@ -12,7 +12,8 @@ message_runtime
 tf
 lwr_controllers
 robot_motion_generation
-lwr_fri)
+lwr_fri
+kdl_parser)
 
 set(CMAKE_CXX_FLAGS "-O2 -O3 -std=c++11 -Wall -Wno-deprecated-declarations -Wno-unused-variable -Wno-reorder")
 
