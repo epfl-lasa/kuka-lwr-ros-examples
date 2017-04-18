@@ -27,7 +27,15 @@ Linear_cart_action::Linear_cart_action(ros::NodeHandle& nh):
 
     b_run       = false;
     b_position  = false;
+        
+    bFirst		= false;
+    bSwitch		= false;
 
+    target_id = 0;
+    target_id_tmp = 0;
+    dist_target = 0;
+
+    loop_rate_hz = 100;
 
 }
 
