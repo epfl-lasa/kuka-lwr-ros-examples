@@ -1,11 +1,117 @@
 <?xml version="1.0" ?>
 <launch>
+  <arg name="t1_limits" 		default="false"/>
+  <arg name="controllers" 	default="joint_controllers"/>
+  <arg name="start_controller"	default="joint_controllers"/>
 
-	<!-- REAL ROBOT LAUNCH FILE  "Simple example" -->
+  <arg name="rviz_config" default="$(find lwr_simple_example)/launch/rviz/rviz_config.rviz"/>
+  <arg name="load-rviz" default="true"/>
+  <arg name="rviz_bringup" default="$(arg load-rviz)"/> <!--alias-->
 
-	<include file="$(find lwr_fri)/launch/lwr_fri.launch">
-    		<arg name="rviz_config"       value="$(find lwr_simple_example)/launch/rviz/rviz_config.rviz"/>
-		<arg name="load-rviz"	      value="true"/>
-        </include>
+  <arg name="controller_file" 	default="$(find single_lwr_robot)/config/controllers.yaml"/>
+  <arg name="hw_interface_file"   default="$(find single_lwr_robot)/config/hw_interface.yaml"/>
+  <arg name="joint_limit_file"    default="$(find single_lwr_robot)/config/t1_joint_limits.yaml"/>
+  <arg name="fri_driver_file"     default="$(find single_lwr_robot)/config/980241-FRI-Driver.init"/>
+  <arg name="robot_urdf_file"   default="$(find single_lwr_robot)/robot/single_lwr_robot.urdf.xacro"/>
+  <arg name="robot_name"   default="lwr"/>
+  <arg name="robot_world"   default="world"/>
 
+  <!-- Load updated joint limits (override information from single_lwr_moveit) to respect T1 mode limits -->
+  <group if="$(arg t1_limits)" ns="robot_description_planning">
+    <!-- <rosparam file="$(arg joint_limit_file)" command="load"/> -->
+    <rosparam subst_value="true">
+    joint_limits:
+      $(arg robot_name)_0_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.5
+      $(arg robot_name)_1_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.5
+      $(arg robot_name)_2_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.8
+      $(arg robot_name)_3_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.8
+      $(arg robot_name)_4_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.8
+      $(arg robot_name)_5_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.8
+      $(arg robot_name)_6_joint:
+        has_velocity_limits: true
+        max_velocity: 0.24
+        has_acceleration_limits: true
+        max_acceleration: 0.8
+    </rosparam>
+  </group>
+
+  <param name="start_controller" type="string" value="$(arg start_controller)" />
+
+  <!-- load robotHW configurations to rosparam server -->
+  <!-- <rosparam file="$(arg hw_interface_file)" command="load"/> -->
+  <rosparam subst_value="true">
+  $(arg robot_name):
+    root_name: $(arg robot_name)_base_link
+    tip_name: $(arg robot_name)_7_link
+    joints: 
+    - $(arg robot_name)_0_joint
+    - $(arg robot_name)_1_joint
+    - $(arg robot_name)_2_joint
+    - $(arg robot_name)_3_joint
+    - $(arg robot_name)_4_joint
+    - $(arg robot_name)_5_joint
+    - $(arg robot_name)_6_joint
+  </rosparam>
+
+  <!-- load all controller configurations to rosparam server -->
+  <!-- <rosparam file="$(arg controller_file)" command="load"/> -->
+  <rosparam subst_value="true">
+  $(arg robot_name):
+    kuka_joint_state_controller:
+      type: lwr_controllers/KUKAJointStateController
+      publish_rate: 200  
+      root_name: $(arg robot_name)_base_link
+      tip_name: $(arg robot_name)_7_link
+
+    joint_controllers:
+      type: lwr_controllers/JointControllers
+      root_name: $(arg robot_name)_base_link
+      tip_name: $(arg robot_name)_7_link
+      max_ee_dt : 1
+      max_ee_f : 5
+      max_qdot : 3
+  </rosparam>
+
+  <param name="fri_drivers" type="str" value="$(arg fri_driver_file)"/>
+
+
+  <group ns="$(arg robot_name)">
+    <param name="robot_description" command="$(find xacro)/xacro.py $(arg robot_urdf_file) robot_name:=$(arg robot_name) robot_world:=$(arg robot_world)"/>
+
+    <node  name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node  name="controller_spawner_js" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="--namespace=/$(arg robot_name) kuka_joint_state_controller"/>
+    <node  name="controller_spawner"    pkg="controller_manager"    type="spawner" respawn="false" output="screen" args="--namespace=/$(arg robot_name) --stopped $(arg controllers)"/>
+
+    <node name="lwr_fri" pkg="lwr_fri" type="lwr_fri_node" output="screen" args="$(arg robot_name)"/>
+  </group>
+
+  <!-- LAUNCH RVIZ -->
+  <group if="$(arg rviz_bringup)">
+    <node name="lwr_rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(arg rviz_config)" output="screen"/>
+  </group>
 </launch>
